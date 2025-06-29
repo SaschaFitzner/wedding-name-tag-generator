@@ -1,14 +1,10 @@
-FROM ubuntu:22.04
+# Use the official OpenSCAD dev image directly
+FROM openscad/openscad:dev
 
-# Install dependencies and Node.js 18
+# Install Node.js 18
 RUN apt-get update && apt-get install -y \
     curl \
-    openscad \
-    fonts-stix \
     wget \
-    unzip \
-    fontconfig \
-    xvfb \
     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*

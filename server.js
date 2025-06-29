@@ -37,8 +37,8 @@ async function checkOpenSCAD() {
 async function generateSTL(scadPath, stlPath) {
     // Use xvfb-run for headless operation in Docker
     const command = process.env.DISPLAY 
-        ? `xvfb-run -a openscad -o "${stlPath}" "${scadPath}"`
-        : `openscad -o "${stlPath}" "${scadPath}"`;
+        ? `xvfb-run -a openscad --enable textmetrics -o "${stlPath}" "${scadPath}"`
+        : `openscad --enable textmetrics -o "${stlPath}" "${scadPath}"`;
     
     try {
         console.log(`Executing: ${command}`);
@@ -59,7 +59,7 @@ async function generateSTL(scadPath, stlPath) {
 
 // API endpoint to generate STL files
 app.post('/api/generate-stl', async (req, res) => {
-    const { names } = req.body;
+    const { names, tagHeight = 12, tagThickness = 2 } = req.body;
     
     if (!names || !Array.isArray(names) || names.length === 0) {
         return res.status(400).json({ error: 'No names provided' });
@@ -99,7 +99,10 @@ app.post('/api/generate-stl', async (req, res) => {
             const cleanName = name.trim().toUpperCase();
             
             // Create personalized SCAD file
-            const personalizedScad = template.replace(/name = "[^"]*"/, `name = "${cleanName}"`);
+            let personalizedScad = template.replace(/name = "[^"]*"/, `name = "${cleanName}"`);
+            // Replace height and thickness parameters
+            personalizedScad = personalizedScad.replace(/tag_height = [\d.]+/, `tag_height = ${tagHeight}`);
+            personalizedScad = personalizedScad.replace(/tag_thickness = [\d.]+/, `tag_thickness = ${tagThickness}`);
             const scadPath = path.join(workDir, `${cleanName}_tag.scad`);
             const stlPath = path.join(workDir, `${cleanName}_tag.stl`);
             

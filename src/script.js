@@ -217,6 +217,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get the names from the textarea
         const names = nameList.value.trim().split('\n').filter(name => name.trim() !== '');
         
+        // Get the tag parameters
+        const tagHeight = document.getElementById('tagHeight').value;
+        const tagThickness = document.getElementById('tagThickness').value;
+        
         // Show processing status
         const originalText = this.textContent;
         this.textContent = 'Generating STL files...';
@@ -234,7 +238,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ names })
+                body: JSON.stringify({ 
+                    names,
+                    tagHeight: parseFloat(tagHeight),
+                    tagThickness: parseFloat(tagThickness)
+                })
             });
             
             if (!response.ok) {
